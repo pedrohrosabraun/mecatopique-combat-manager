@@ -1,0 +1,2 @@
+# mecatopique-combat-manager
+Mecatopique
