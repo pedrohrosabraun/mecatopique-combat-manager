@@ -20,6 +20,18 @@ input,select,button{background:#3b2d23;color:#E8DCC4;border:1px solid #B08D57;bo
 .status-burning{color:#f97316}.status-frozen{color:#60a5fa}.status-blind{color:#a855f7}
 .status-rooted{color:#a16207}.status-stunned{color:#fde047}.status-paralyzed{color:#ec4899}
 .status-surprised{color:#06b6d4}.status-unconscious{color:#94a3b8}.status-dead{color:#fff;background:#000}
+.setup-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(120px,1fr));
+    gap:10px;
+    margin-top:10px;
+    margin-bottom:10px;
+}
+
+.setup-field{
+    display:flex;
+    flex-direction:column;
+}
 </style>
 </head>
 <body>
@@ -27,24 +39,50 @@ input,select,button{background:#3b2d23;color:#E8DCC4;border:1px solid #B08D57;bo
 <h1>CITY OF MECATOPIQUE</h1>
 <div class="sub">REPUBLIC TACTICAL COMMAND</div>
 <div>Governor Emmalia Rendors | Republic Year 37</div>
-Session <input id="session"> Date <input id="date" type="date">
+📖 Session <input id="session">
+📅 Date <input id="date" type="date">
 </div>
 
-<div class="box"><h2>Roster</h2><div id="roster"></div></div>
+<div class="box">
+<h2>👥 Roster</h2>
+<div id="roster"></div>
+<br>
+<button onclick="save()">💾 Save All Data</button>
+</div>
 
 <div class="box">
-<h2>Combat Setup</h2>
+<h2>⚙️ Combat Setup</h2>
 <button onclick="startCombat()">Start New Combat</button>
 <button onclick="resetCombat()">Reset Combat</button><br><br>
-<label>Mob Name</label><input id="mobName">
-<label>Max HP</label><input id="mobHP" type="number">
-<label>VP</label><input id="mobVP" type="number">
-<label>Number of Mobs</label><input id="mobCount" type="number" value="1">
-<button onclick="addMob()">Add Mob(s)</button>
+<div class="setup-grid">
+
+    <div class="setup-field">
+        <label>🤖 Mob Name</label>
+        <input id="mobName">
+    </div>
+
+    <div class="setup-field">
+        <label>❤️ Max HP</label>
+        <input id="mobHP" type="number">
+    </div>
+
+    <div class="setup-field">
+        <label>⚡ VP</label>
+        <input id="mobVP" type="number">
+    </div>
+
+    <div class="setup-field">
+        <label>👥 Number of Mobs</label>
+        <input id="mobCount" type="number" value="1">
+    </div>
+
+</div>
+
+<button onclick="addMob()">➕ Add Mob(s)</button>
 </div>
 
 <div class="box turn">
-<div>ROUND <span id="round">1</span></div>
+<div>🎲 ROUND <span id="round">1</span></div>
 <h2 id="turnName">NO COMBAT</h2>
 <div id="summary"></div>
 <button onclick="nextTurn()">Next Turn</button>
@@ -61,7 +99,20 @@ Session <input id="session"> Date <input id="date" type="date">
 <script>
 const K='mecatopique_v10';
 const MODS=[-50,-25,0,7,15,25,32,40,50,70,95];
-const ST=['Healthy','Poisoned','Bleeding','Burning','Frozen','Blind','Rooted','Stunned','Paralyzed','Surprised','Unconscious','Dead'];
+const ST=[
+'🤍 Healthy',
+'🟢 Poisoned',
+'🔴 Bleeding',
+'🔥 Burning',
+'🧊 Frozen',
+'🟣 Blind',
+'🌿 Rooted',
+'💫 Stunned',
+'⚡ Paralyzed',
+'❗ Surprised',
+'💀 Unconscious',
+'☠️ Dead'
+];
 let D=JSON.parse(localStorage.getItem(K)||'null')||{
 session:'Session 1',date:new Date().toISOString().slice(0,10),
 roster:[{n:'Player 1',hp:100},{n:'Player 2',hp:100},{n:'Player 3',hp:100},{n:'Player 4',hp:100},{n:'Player 5',hp:100},{n:'Player 6',hp:100}],
@@ -86,10 +137,10 @@ for(let i=1;i<=c;i++)D.combat.push({name:c>1?n+' #'+i:n,maxHp:hp,hp:hp,vp:vp,rol
 render();
 }
 function sortC(){D.combat.sort((a,b)=>fin(b)-fin(a));}
-function skip(c){return c.early||c.status==='Dead'||c.status==='Unconscious'}
+function skip(c){return c.early||c.status==='☠️ Dead'||c.status==='💀 Unconscious'}
 function nextTurn(){let n=D.current+1;while(n<D.combat.length&&skip(D.combat[n]))n++;if(n>=D.combat.length){newRound();return;}D.current=n;render();}
 function newRound(){D.round++;D.current=0;D.combat.forEach(c=>c.early=false);render();}
-function dmg(i,v){D.combat[i].hp=Math.max(0,D.combat[i].hp-v);if(D.combat[i].hp==0)D.combat[i].status='Dead';render();}
+function dmg(i,v){D.combat[i].hp=Math.max(0,D.combat[i].hp-v);if(D.combat[i].hp==0)D.combat[i].status='☠️ Dead';render();}
 function heal(i,v){D.combat[i].hp=Math.min(D.combat[i].maxHp,D.combat[i].hp+v);render();}
 
 function render(){
