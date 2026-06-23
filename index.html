@@ -13,7 +13,11 @@ h1,h2{margin:4px 0;color:#E0C27A}
 .current{outline:3px solid #59D7FF;background:#38424d}
 .dead{background:#000}
 .early{background:#666}
-table{width:100%;border-collapse:collapse;font-size:13px}
+table{
+width:100%;
+border-collapse:collapse;
+font-size:16px;
+}
 th,td{border-bottom:1px solid #555;padding:4px}
 input,select,button{background:#3b2d23;color:#E8DCC4;border:1px solid #B08D57;border-radius:4px;padding:4px}
 .status-healthy{color:#fff}.status-poisoned{color:#22c55e}.status-bleeding{color:#ef4444}
@@ -127,13 +131,13 @@ HP <input type="number" value="${p.hp}" onchange="D.roster[${i}].hp=+this.value;
 roster.innerHTML=h;
 }
 function startCombat(){
-D.combat=D.roster.map(p=>({name:p.n,maxHp:p.hp,hp:p.hp,vp:'',roll:0,mod:0,status:'Healthy',notes:'',early:false,type:'Player'}));
+D.combat=D.roster.map(p=>({name:p.n,maxHp:p.hp,hp:p.hp,vp:'',roll:0,mod:0,status:'🤍 Healthy',notes:'',early:false,type:'Player'}));
 D.current=0;render();
 }
 function resetCombat(){D.combat=[];D.round=1;D.current=0;render();}
 function addMob(){
 let n=mobName.value||'Mob',hp=+mobHP.value||0,vp=+mobVP.value||0,c=+mobCount.value||1;
-for(let i=1;i<=c;i++)D.combat.push({name:c>1?n+' #'+i:n,maxHp:hp,hp:hp,vp:vp,roll:0,mod:0,status:'Healthy',notes:'',early:false,type:'Mob'});
+for(let i=1;i<=c;i++)D.combat.push({name:c>1?n+' #'+i:n,maxHp:hp,hp:hp,vp:vp,roll:0,mod:0,status:'🤍 Healthy',notes:'',early:false,type:'Mob'});
 render();
 }
 function sortC(){D.combat.sort((a,b)=>fin(b)-fin(a));}
@@ -146,10 +150,10 @@ function heal(i,v){D.combat[i].hp=Math.min(D.combat[i].maxHp,D.combat[i].hp+v);r
 function render(){
 sortC(); session.value=D.session; date.value=D.date; round.textContent=D.round;
 let c=D.combat[D.current];
-turnName.textContent=c?c.name:'NO COMBAT';
+turnName.textContent=c?'▶️ '+c.name:'▶️ NO COMBAT';
 summary.textContent=c?`Init ${fin(c)} | HP ${c.hp}/${c.maxHp} | VP ${c.vp||'-'} | ${c.status}`:'';
 tb.innerHTML=D.combat.map((c,i)=>{
-let cls=i===D.current?'current':''; if(c.early)cls='early'; if(c.status==='Dead')cls='dead';
+let cls=i===D.current?'current':''; if(c.early)cls='early'; if(c.status==='☠️ Dead')cls='dead';
 let dmgOpts=[...Array(101).keys()].map(n=>`<option>${n}</option>`).join('');
 return `<tr class="${cls}">
 <td>${i+1}</td>
@@ -159,7 +163,7 @@ return `<tr class="${cls}">
 <td>${fin(c)}</td>
 <td>${c.hp}/${c.maxHp}</td>
 <td>${c.type==='Mob'?`<input style="width:55px" value="${c.vp}" onchange="D.combat[${i}].vp=this.value;save()">`:'-'}</td>
-<td><select onchange="D.combat[${i}].status=this.value;render()">${ST.map(s=>`<option ${c.status==s?'selected':''}>${s}</option>`).join('')}</select><div class="status-${c.status.toLowerCase()}">${c.status}</div></td>
+<td><select onchange="D.combat[${i}].status=this.value;render()">${ST.map(s=>`<option ${c.status==s?'selected':''}>${s}</option>`).join('')}</select><div>${c.status}</div></td>
 <td><input value="${c.notes}" onchange="D.combat[${i}].notes=this.value;save()"></td>
 <td>
 <button onclick="if(${i}===D.current)nextTurn();else{D.combat[${i}].early=!D.combat[${i}].early;render()}">Acted Early / End Turn</button><br>
