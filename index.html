@@ -102,7 +102,6 @@ input,select,button{background:#3b2d23;color:#E8DCC4;border:1px solid #B08D57;bo
 
 <script>
 const K='mecatopique_v10';
-const MODS=[-50,-25,0,7,15,25,32,40,50,70,95];
 const ST=[
 '🤍 Healthy',
 '🟢 Poisoned',
@@ -123,7 +122,7 @@ roster:[{n:'Player 1',hp:100},{n:'Player 2',hp:100},{n:'Player 3',hp:100},{n:'Pl
 round:1,current:0,combat:[]};
 
 function save(){D.session=session.value;D.date=date.value;localStorage.setItem(K,JSON.stringify(D));}
-function fin(c){return (+c.roll)+(+c.mod)}
+function fin(c){return (+c.init||0)}
 function rosterUI(){
 let h='';
 D.roster.forEach((p,i)=>h+=`<div><input value="${p.n}" onchange="D.roster[${i}].n=this.value;save()">
@@ -131,13 +130,13 @@ HP <input type="number" value="${p.hp}" onchange="D.roster[${i}].hp=+this.value;
 roster.innerHTML=h;
 }
 function startCombat(){
-D.combat=D.roster.map(p=>({name:p.n,maxHp:p.hp,hp:p.hp,vp:'',roll:0,mod:0,status:'🤍 Healthy',notes:'',early:false,type:'Player'}));
+D.combat=D.roster.map(p=>({name:p.n,maxHp:p.hp,hp:p.hp,vp:'',init:0,status:'🤍 Healthy',notes:'',early:false,type:'Player'}));
 D.current=0;render();
 }
 function resetCombat(){D.combat=[];D.round=1;D.current=0;render();}
 function addMob(){
 let n=mobName.value||'Mob',hp=+mobHP.value||0,vp=+mobVP.value||0,c=+mobCount.value||1;
-for(let i=1;i<=c;i++)D.combat.push({name:c>1?n+' #'+i:n,maxHp:hp,hp:hp,vp:vp,roll:0,mod:0,status:'🤍 Healthy',notes:'',early:false,type:'Mob'});
+for(let i=1;i<=c;i++)D.combat.push({name:c>1?n+' #'+i:n,maxHp:hp,hp:hp,vp:vp,init:0,status:'🤍 Healthy',notes:'',early:false,type:'Mob'});
 render();
 }
 function sortC(){D.combat.sort((a,b)=>fin(b)-fin(a));}
@@ -158,9 +157,15 @@ let dmgOpts=[...Array(101).keys()].map(n=>`<option>${n}</option>`).join('');
 return `<tr class="${cls}">
 <td>${i+1}</td>
 <td>${c.name}</td>
-<td><select onchange="D.combat[${i}].roll=+this.value;render()">${[...Array(101).keys()].map(n=>`<option ${c.roll==n?'selected':''}>${n}</option>`).join('')}</select></td>
-<td><select onchange="D.combat[${i}].mod=+this.value;render()">${MODS.map(m=>`<option value="${m}" ${c.mod==m?'selected':''}>${m}</option>`).join('')}</select></td>
-<td>${fin(c)}</td>
+<td>
+<input
+type="number"
+min="-100"
+max="300"
+value="${c.init||0}"
+style="width:90px"
+onchange="D.combat[${i}].init=+this.value;render()">
+</td>
 <td>${c.hp}/${c.maxHp}</td>
 <td>${c.type==='Mob'?`<input style="width:55px" value="${c.vp}" onchange="D.combat[${i}].vp=this.value;save()">`:'-'}</td>
 <td><select onchange="D.combat[${i}].status=this.value;render()">${ST.map(s=>`<option ${c.status==s?'selected':''}>${s}</option>`).join('')}</select><div>${c.status}</div></td>
