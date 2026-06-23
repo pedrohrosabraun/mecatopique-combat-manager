@@ -95,7 +95,7 @@ input,select,button{background:#3b2d23;color:#E8DCC4;border:1px solid #B08D57;bo
 
 <div class="box">
 <table>
-<thead><tr><th>#</th><th>Name</th><th>Roll</th><th>Mod</th><th>Final</th><th>HP</th><th>VP</th><th>Status</th><th>Notes</th><th>Actions</th></tr></thead>
+<thead><tr><th>#</th><th>Name</th><th>Initiative</th><th>HP</th><th>VP</th><th>Status</th><th>Notes</th><th>Actions</th></tr></thead>
 <tbody id="tb"></tbody>
 </table>
 </div>
@@ -150,20 +150,22 @@ function render(){
 sortC(); session.value=D.session; date.value=D.date; round.textContent=D.round;
 let c=D.combat[D.current];
 turnName.textContent=c?'▶️ '+c.name:'▶️ NO COMBAT';
-summary.textContent=c?`Init ${fin(c)} | HP ${c.hp}/${c.maxHp} | VP ${c.vp||'-'} | ${c.status}`:'';
+summary.textContent=c?
+`Initiative ${fin(c)} | HP ${c.hp}/${c.maxHp} | VP ${c.vp||'-'} | ${c.status}`:'';
 tb.innerHTML=D.combat.map((c,i)=>{
 let cls=i===D.current?'current':''; if(c.early)cls='early'; if(c.status==='☠️ Dead')cls='dead';
 let dmgOpts=[...Array(101).keys()].map(n=>`<option>${n}</option>`).join('');
 return `<tr class="${cls}">
 <td>${i+1}</td>
 <td>${c.name}</td>
+
 <td>
 <input
 type="number"
 min="-100"
 max="300"
 value="${c.init||0}"
-style="width:90px"
+style="width:90px;font-size:18px"
 onchange="D.combat[${i}].init=+this.value;render()">
 </td>
 <td>${c.hp}/${c.maxHp}</td>
